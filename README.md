@@ -9,7 +9,7 @@ monte carlo simulation and a small logic DSL.
 
 To describe the space of events you need to define a situation
 
-     > (defsituation flavors () spicy sweet salty sour)
+     > (defsituation flavors spicy sweet salty sour)
      > (flavors "pudding"
                 :sweet 0.7  ; most puddings are sweet
                 :salty 0.1  ; some quite horrible puddings are salty

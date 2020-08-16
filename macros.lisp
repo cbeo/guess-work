@@ -8,9 +8,9 @@
   `(let ((*considering-slots* (slot-names (find-class ',class) t)))
      ,@body))
 
-(defmacro defsituation (name supers &rest slots)
+(defmacro defsituation (name &rest slots)
   `(progn
-     (defclass ,name (situation ,@supers)
+     (defclass ,name (situation)
        ,(loop :for slot :in slots
            :collect `(,slot :initarg ,(make-keyword slot)
                             :initform 0)))
