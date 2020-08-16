@@ -5,7 +5,7 @@
     (read-from-string (concatenate 'string ":" (symbol-name symbol)))))
 
 (defmacro with-situation-class ((class) &rest body)
-  `(let ((*considering-slots* (slot-names (find-class ',class t))))
+  `(let ((*considering-slots* (slot-names (find-class ',class) t)))
      ,@body))
 
 (defmacro defsituation (name supers &rest slots)

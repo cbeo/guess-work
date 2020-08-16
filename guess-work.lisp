@@ -19,7 +19,7 @@
 (defun slot-conj->number (&rest slots)
   (loop
      :for s :in *considering-slots*
-     :for pow :from 6 :downto 0
+     :for pow :from (1- (length *considering-slots*)) :downto 0
      :summing (* (if (member s slots) 1 0)
                  (expt 2 pow))))
 
@@ -84,21 +84,21 @@
 ;; TODO handle case of single symbol, single :and form, and single :or
 ;; form filled soley with slot names
 (defun canonical-to-rule (canonical)
-
-  (let ((conj-preds (loop :for conj :in (cdr canonical)
-                       :collect (apply #'slot-conj->number (cdr conj))))) 
+  (let* ((canonical (if (eql :and (car canonical))  (list :or canonical)
+                        (cons :or (mapcar (lambda (x) (if (atom x) (list :and x) x))
+                                          (cdr canonical)))))
+         (conj-preds (loop :for conj :in (cdr canonical)
+                        :collect (apply #'slot-conj->number (cdr conj)))))
+    (print canonical)
+    (print conj-preds)
     (lambda (n)
       (loop
          :for pred :in conj-preds
          :when (conj-check pred n) :do  (return t)
          :finally (return nil)))))
 
-(defun make-rule (expr &key class)
-  (let ((*considering-slots* (or *considering-slots*
-                                 (and class (slot-names class t)))))
-    (assert *considering-slots*)
-    (print *considering-slots*)
-    (canonical-to-rule (canonicalize expr))))
+(defun make-rule (expr)
+  (canonical-to-rule (canonicalize expr)))
 
 (defun bvec->number (v)
   (loop
@@ -136,7 +136,7 @@
        :do
          (dolist (idx (n-distinct-between (floor (* prob sample-size)) :high sample-size))
            (setf (aref table idx key) 1)))
-    (let ((row (make-array 7
+    (let ((row (make-array width
                            :element-type 'bit
                            :displaced-to table
                            :displaced-index-offset 0
@@ -160,7 +160,7 @@
          (sort 
           (loop
              :for entry :in data
-             :for situation = entry
+             :for situation = entry2
              :collect (cons (slot-value situation 'label)
                             (run-simulation situation rule :size size)))
           sort-by :key #'cdr)))
