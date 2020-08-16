@@ -98,6 +98,8 @@
          :finally (return nil)))))
 
 (defun make-rule (expr)
+  (assert *considering-slots* nil
+          "MAKE-RULE must be called within the body of WITH-SITUATION-CLASS")
   (canonical-to-rule (canonicalize expr)))
 
 (defun bvec->number (v)
@@ -127,8 +129,7 @@
         (setf nums new-nums)))))
 
 (defun generate (situation &key (sample-size 100))
-  (let* ((*considering-slots* (slot-names situation))
-         (width (length *considering-slots*))
+  (let* ((width (length *considering-slots*))
          (table (make-array (list sample-size width) :element-type 'bit)))
     (loop
        :for prob :in (situation->list situation)
@@ -150,20 +151,26 @@
                             :displaced-index-offset (* (1+ i) width))))))
 
 (defun run-simulation (situation rule &key (size 100))
-  (let ((samples (generate situation :sample-size size)))
+  (assert *considering-slots* nil
+          "RUN-SIMULATION must be called within body of WITH-SITUATION-CLASS")
+  (let ((rule (if (functionp rule) rule (make-rule rule)))
+        (samples (generate situation :sample-size size)))
     (/ (loop :for s :in samples
           :when (funcall rule s) :count s)
        (* 1.0 size))))
 
 (defun run-and-print-simulation-on-data (rule data &key (size 100) (sort-by #'>))
-  (let ((table 
-         (sort 
-          (loop
-             :for entry :in data
-             :for situation = entry2
-             :collect (cons (slot-value situation 'label)
-                            (run-simulation situation rule :size size)))
-          sort-by :key #'cdr)))
+  (assert *considering-slots* nil
+          "RUN-AND-PRINT-SIMULATION-ON-DATA must be called within body of WITH-SITUATION-CLASS")
+  (let* ((rule (if (functionp rule) rule (make-rule rule)))
+         (table 
+          (sort 
+           (loop
+              :for entry :in data
+              :for situation = entry
+              :collect (cons (slot-value situation 'label)
+                             (run-simulation situation rule :size size)))
+           sort-by :key #'cdr)))
     (mapc (lambda (pair) (format t "~40a: ~a~%" (car pair) (cdr pair))) table)
     (values)))
 
