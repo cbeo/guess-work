@@ -3,6 +3,7 @@
 (defpackage #:guess-work
   (:use #:cl)
   (:export #:situation
+           #:label 
            #:make-rule
            #:with-situation-class
            #:run-simulation

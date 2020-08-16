@@ -3,7 +3,9 @@
 (in-package #:guess-work)
 
 (defclass situation ()
-  ((label :initarg :label :initform (error "must provide a label"))))
+  ((label :reader label
+          :initarg :label
+          :initform (error "must provide a label"))))
 
 (defun slot-names (instance &optional class)
   (sort 
@@ -89,8 +91,6 @@
                                           (cdr canonical)))))
          (conj-preds (loop :for conj :in (cdr canonical)
                         :collect (apply #'slot-conj->number (cdr conj)))))
-    (print canonical)
-    (print conj-preds)
     (lambda (n)
       (loop
          :for pred :in conj-preds
@@ -166,8 +166,7 @@
          (table 
           (sort 
            (loop
-              :for entry :in data
-              :for situation = entry
+              :for situation :in data
               :collect (cons (slot-value situation 'label)
                              (run-simulation situation rule :size size)))
            sort-by :key #'cdr)))
