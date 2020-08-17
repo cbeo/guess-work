@@ -9,14 +9,17 @@
      ,@body))
 
 (defmacro defsituation (name &rest slots)
-  `(progn
-     (defclass ,name (situation)
-       ,(loop :for slot :in slots
-           :collect `(,slot :initarg ,(make-keyword slot)
-                            :initform 0)))
-     
-     (defun ,name (label &key ,@(mapcar (lambda (s)  (list s 0)) slots))
-       (apply 'make-instance ',name :label label
-              ,(cons 'list (loop :for slot :in slots
-                             :append (list (make-keyword slot) slot)))))))
+  (let ((slots (if (stringp  (car slots)) (cdr slots) slots))
+        (docstring (when (stringp (car slots)) (car slots))))
+    `(progn
+       (defclass ,name (situation)
+         ,(loop :for slot :in slots
+             :collect `(,slot :initarg ,(make-keyword slot)
+                              :initform 0))
+         ,@(when docstring (list  (list :documentation docstring))))
+       
+       (defun ,name (label &key ,@(mapcar (lambda (s)  (list s 0)) slots))
+         (apply 'make-instance ',name :label label
+                ,(cons 'list (loop :for slot :in slots
+                                :append (list (make-keyword slot) slot))))))))
 
