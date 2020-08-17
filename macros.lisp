@@ -9,6 +9,10 @@
      ,@body))
 
 (defmacro defsituation (name &rest slots)
+  "(defsituation foo slot1 slot2 slot3)  
+
+(defsituation foo \"docstring\" slot1 slot2 slot3)
+"
   (let ((slots (if (stringp  (car slots)) (cdr slots) slots))
         (docstring (when (stringp (car slots)) (car slots))))
     `(progn
