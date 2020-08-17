@@ -16,6 +16,18 @@
    #'string<
    :key #'symbol-name))
 
+(defmethod print-object ((ob situation) stream)
+  (let ((*standard-output* stream))
+    (princ "#<situation ") (princ (label ob)) 
+    (dolist (slot (slot-names ob))
+      (terpri)
+      (princ "    ")
+      (princ (symbol-name slot))
+      (princ ": ")
+      (princ (slot-value ob slot))
+      )
+    (princ ">") (terpri)))
+
 (defvar *considering-slots* nil)
 
 (defun slot-conj->number (&rest slots)
