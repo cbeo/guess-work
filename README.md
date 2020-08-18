@@ -21,11 +21,11 @@ that describes when something tastes good:
 
      
     > (defvar +tasty+ 
-              '(:or (:and sweet spicy) 
-                     (:and sweet salty) 
-                     (:and spicy sour) 
-                     (:and sweet sour)
-                     (:and spicy salty)))))
+        '(:or (:and sweet spicy) 
+              (:and sweet salty) 
+              (:and spicy sour) 
+              (:and sweet sour)
+              (:and spicy salty)))))
     
     
 In general, you can use expression of nested conjunction and disjunctions, e.g. `(:and a b (:or c d))`
@@ -33,19 +33,19 @@ In general, you can use expression of nested conjunction and disjunctions, e.g. 
 Next you need some situations to run the rule on.
 
     > (defvar +data+ 
-             (list (flavors "pudding" :sweet 0.7 :salty 0.2)
-                   (flavors "pizzas" :sweet 0.2 :salty 0.9 :spicy 0.7)
-                   (flavors "ramen" :salty 0.9 :sour 0.1 :spicy 0.9)))
+        (list (flavors "pudding" :sweet 0.7 :salty 0.2)
+              (flavors "pizzas" :sweet 0.2 :salty 0.9 :spicy 0.7)
+              (flavors "ramen" :salty 0.9 :sour 0.1 :spicy 0.9)))
                    
 
 Finally, just run some simulations:
 
     > (with-situation-class (flavors) 
-               (let ((rule (make-rule +tasty+)))
-                 (loop :for situation :in +data+ 
-                       :do (format t "~10a: ~a~%" 
-                                   (slot-value situation 'label)
-                                   (run-simulation situation rule)))))
+        (let ((rule (make-rule +tasty+)))
+          (loop :for situation :in +data+ 
+                :do (format t "~10a: ~a~%" 
+                            (slot-value situation 'label)
+                            (run-simulation situation rule)))))
     pudding   : 0.14
     pizzas    : 0.7
     ramen     : 0.81
