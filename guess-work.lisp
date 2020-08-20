@@ -95,8 +95,6 @@
         (t (error "what?"))))
 
 
-;; TODO handle case of single symbol, single :and form, and single :or
-;; form filled soley with slot names
 (defun canonical-to-rule (canonical)
   (let* ((canonical (if (eql :and (car canonical))  (list :or canonical)
                         (cons :or (mapcar (lambda (x) (if (atom x) (list :and x) x))
